@@ -9,8 +9,8 @@ import { FaGithub, FaTwitter, FaFacebook } from "react-icons/fa";
 const PortfolioHeader = () => {
   const handleDownload = (type: "cv" | "coverLetter") => {
     const fileUrls = {
-      cv: "/cv.pdf",
-      coverLetter: "/cv.pdf",
+      cv: "/Christopher-Eshun-CV.pdf",
+      coverLetter: "/Christopher-Eshun-Cover-Letter.pdf",
     };
 
     const link = document.createElement("a");

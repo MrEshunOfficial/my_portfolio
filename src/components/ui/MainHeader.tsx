@@ -13,7 +13,6 @@ import Link from "next/link";
 
 export default function MainHeader() {
   const { setTheme } = useTheme();
-  const [activeNav, setActiveNav] = useState("home");
 
   const ThemeToggleButton = () => (
     <Popover>
