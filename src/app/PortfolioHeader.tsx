@@ -7,6 +7,21 @@ import { Button } from "@/components/ui/button";
 import { FaGithub, FaTwitter, FaFacebook } from "react-icons/fa";
 
 const PortfolioHeader = () => {
+  const handleDownload = (type: "cv" | "coverLetter") => {
+    const fileUrls = {
+      cv: "/cv.pdf",
+      coverLetter: "/cv.pdf",
+    };
+
+    const link = document.createElement("a");
+    link.href = fileUrls[type];
+    link.download =
+      type === "cv"
+        ? "Christopher-Eshun-CV.pdf"
+        : "Christopher-Eshun-Cover-Letter.pdf";
+    link.click();
+  };
+
   return (
     <header className="shadow-sm bg-white dark:bg-gray-900 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
@@ -51,7 +66,10 @@ const PortfolioHeader = () => {
               >
                 <FaFacebook size={20} />
               </Link>
-              <Button className="flex items-center p-2 bg-green-600 dark:bg-green-700 text-white rounded-full hover:bg-green-700 dark:hover:bg-green-800">
+              <Button
+                onClick={() => handleDownload("cv")}
+                className="flex items-center p-2 bg-green-600 dark:bg-green-700 text-white rounded-full hover:bg-green-700 dark:hover:bg-green-800"
+              >
                 <Download size={20} className="mr-2" />
                 Download CV
               </Button>
