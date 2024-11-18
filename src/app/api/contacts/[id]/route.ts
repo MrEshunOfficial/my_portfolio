@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { connect } from '@/dbconfigue/dbConfigue';
 import { ContactProfile } from '@/models/contactModel';
 
-
 // Zod validation schema
 const ContactSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -77,5 +76,3 @@ export async function handler(
     return handleError(error);
   }
 }
-
-export { handler as GET, handler as PUT, handler as DELETE };
