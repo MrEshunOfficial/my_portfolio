@@ -13,12 +13,14 @@ const PortfolioHeader = () => {
       coverLetter: "/Christopher-Eshun-Cover-Letter.pdf",
     };
 
+    const fileName = {
+      cv: "Christopher-Eshun-CV.pdf",
+      coverLetter: "Christopher-Eshun-Cover-Letter.pdf",
+    };
+
     const link = document.createElement("a");
     link.href = fileUrls[type];
-    link.download =
-      type === "cv"
-        ? "Christopher-Eshun-CV.pdf"
-        : "Christopher-Eshun-Cover-Letter.pdf";
+    link.download = fileName[type];
     link.click();
   };
 
@@ -66,6 +68,8 @@ const PortfolioHeader = () => {
               >
                 <FaFacebook size={20} />
               </Link>
+
+              {/* CV Download Button */}
               <Button
                 onClick={() => handleDownload("cv")}
                 className="flex items-center p-2 bg-green-600 dark:bg-green-700 text-white rounded-full hover:bg-green-700 dark:hover:bg-green-800"
@@ -73,10 +77,19 @@ const PortfolioHeader = () => {
                 <Download size={20} className="mr-2" />
                 Download CV
               </Button>
+
+              {/* Cover Letter Download Button */}
+              <Button
+                onClick={() => handleDownload("coverLetter")}
+                className="flex items-center p-2 bg-blue-600 dark:bg-blue-700 text-white rounded-full hover:bg-blue-700 dark:hover:bg-blue-800"
+              >
+                <Download size={20} className="mr-2" />
+                Download Cover Letter
+              </Button>
             </div>
           </div>
           <Avatar className="h-36 w-36 md:h-48 md:w-48 border border-border dark:border-gray-700 rounded-full shadow-md">
-            <AvatarImage src="/1730457984337-me.jpg" alt="Christopher" />
+            <AvatarImage src="/myPic.jpg" alt="Christopher" />
             <AvatarFallback>
               <UserIcon size={18} />
             </AvatarFallback>

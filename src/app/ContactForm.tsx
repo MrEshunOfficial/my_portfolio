@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -13,12 +13,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { toast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 // Zod Schema for form validation
 const contactSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
-  message: z
+  description: z
     .string()
     .min(10, { message: "Message must be at least 10 characters" }),
 });
@@ -26,23 +28,56 @@ const contactSchema = z.object({
 type ContactFormData = z.infer<typeof contactSchema>;
 
 const ContactForm: React.FC = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
     defaultValues: {
       name: "",
       email: "",
-      message: "",
+      description: "",
     },
   });
 
   const onSubmit = async (data: ContactFormData) => {
+    setIsSubmitting(true);
+
     try {
-      // Handle form submission (e.g., send to backend)
-      console.log("Form Data:", data);
+      const response = await fetch("/api/contacts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Something went wrong");
+      }
+
+      // Success handling
+      toast({
+        title: "Success",
+        description:
+          "Thank you for contacting Christopher! you will receive an email soon",
+        variant: "default",
+      });
+
       // Reset form after successful submission
       form.reset();
     } catch (error) {
-      console.error("Submission error:", error);
+      // Error handling
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -82,7 +117,7 @@ const ContactForm: React.FC = () => {
 
         <FormField
           control={form.control}
-          name="message"
+          name="description"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Message</FormLabel>
@@ -94,9 +129,10 @@ const ContactForm: React.FC = () => {
           )}
         />
 
-        <Button type="submit" className="w-full">
-          Send Message
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Sending..." : "Send Message"}
         </Button>
+        <Toaster />
       </form>
     </Form>
   );

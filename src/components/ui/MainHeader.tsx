@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { Sun, Moon, Laptop, BellIcon } from "lucide-react";
 import {
   Popover,
@@ -9,10 +9,20 @@ import {
 
 import { useTheme } from "next-themes";
 import { Button } from "./button";
-import Link from "next/link";
+import ContactList from "@/app/ContactList";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
+import { fetchContacts } from "@/store/contactSlice";
 
 export default function MainHeader() {
   const { setTheme } = useTheme();
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    dispatch(fetchContacts(1));
+  }, [dispatch]);
+
+  const { contacts } = useSelector((state: RootState) => state.contacts);
 
   const ThemeToggleButton = () => (
     <Popover>
@@ -60,16 +70,17 @@ export default function MainHeader() {
       <div className="flex items-center justify-end gap-3">
         <Popover>
           <PopoverTrigger asChild>
-            <div className="inline-flex items-center justify-center rounded-full w-10 h-10 hover:bg-secondary cursor-pointer">
+            <div className="relative inline-flex items-center justify-center rounded-full w-10 h-10 hover:bg-secondary cursor-pointer">
               <BellIcon size={20} />
+              {contacts.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {contacts.length}
+                </span>
+              )}
             </div>
           </PopoverTrigger>
-          <PopoverContent className="min-w-60 rounded-2xl p-1 mr-1 mt-3">
-            <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-              <li>
-                Your just contacted christopher, he will receive your email
-              </li>
-            </ul>
+          <PopoverContent className="min-w-[30vw] rounded-2xl p-1 mr-1 mt-3">
+            <ContactList />
           </PopoverContent>
         </Popover>
         <ThemeToggleButton />
