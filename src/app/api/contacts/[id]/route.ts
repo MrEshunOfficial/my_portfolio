@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { connect } from '@/dbconfigue/dbConfigue';
 import { ContactProfile } from '@/models/contactModel';
@@ -10,65 +10,76 @@ const ContactSchema = z.object({
   description: z.string().max(500, 'Description must be 500 characters or less').optional()
 });
 
-function handleError(res: NextApiResponse, error: unknown) {
+function handleError(error: unknown) {
   console.error('API Error:', error);
   if (error instanceof z.ZodError) {
-    return res.status(400).json({ error: 'Invalid data', details: error.errors });
+    return NextResponse.json({ error: 'Invalid data', details: error.errors }, { status: 400 });
   }
-  return res.status(500).json({
+  return NextResponse.json({
     error: error instanceof Error ? error.message : 'An unexpected error occurred'
-  });
+  }, { status: 500 });
 }
 
-// Dynamic route handler for GET, PUT, DELETE
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+// GET: Retrieve a specific contact
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
-    // Ensure database connection
     await connect();
-
-    const { id } = req.query;
-
-    // GET: Retrieve a specific contact
-    if (req.method === 'GET') {
-      const contact = await ContactProfile.findById(id);
-      if (!contact) {
-        return res.status(404).json({ error: 'Contact not found' });
-      }
-      return res.status(200).json(contact);
+    const contact = await ContactProfile.findById(params.id);
+    
+    if (!contact) {
+      return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
     }
-
-    // PUT: Update a contact
-    if (req.method === 'PUT') {
-      const body = req.body;
-      const validatedData = ContactSchema.partial().parse(body);
-
-      const updatedContact = await ContactProfile.findByIdAndUpdate(
-        id,
-        validatedData,
-        { new: true, runValidators: true }
-      );
-
-      if (!updatedContact) {
-        return res.status(404).json({ error: 'Contact not found' });
-      }
-
-      return res.status(200).json(updatedContact);
-    }
-
-    // DELETE: Remove a contact
-    if (req.method === 'DELETE') {
-      const deletedContact = await ContactProfile.findByIdAndDelete(id);
-
-      if (!deletedContact) {
-        return res.status(404).json({ error: 'Contact not found' });
-      }
-
-      return res.status(200).json({ message: 'Contact deleted successfully' });
-    }
-
-    // Handle unsupported methods
-    return res.status(405).json({ error: 'Method not allowed' });
+    
+    return NextResponse.json(contact, { status: 200 });
   } catch (error) {
-    return handleError(res, error);
+    return handleError(error);
+  }
+}
+
+// PUT: Update a contact
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connect();
+    const body = await request.json();
+    const validatedData = ContactSchema.partial().parse(body);
+
+    const updatedContact = await ContactProfile.findByIdAndUpdate(
+      params.id,
+      validatedData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedContact) {
+      return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(updatedContact, { status: 200 });
+  } catch (error) {
+    return handleError(error);
+  }
+}
+
+// DELETE: Remove a contact
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    await connect();
+    const deletedContact = await ContactProfile.findByIdAndDelete(params.id);
+
+    if (!deletedContact) {
+      return NextResponse.json({ error: 'Contact not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: 'Contact deleted successfully' }, { status: 200 });
+  } catch (error) {
+    return handleError(error);
   }
 }
