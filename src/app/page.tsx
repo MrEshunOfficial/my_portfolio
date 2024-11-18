@@ -18,9 +18,9 @@ import { Button } from "@/components/ui/button";
 import { FaFacebook, FaGithub, FaTwitter } from "react-icons/fa";
 import Link from "next/link";
 import ContactForm from "./ContactForm";
-import PortfolioHeader from "./PortfolioHeader";
 import PortfolioFooter from "./PortfolioFooter";
 import ActiveProjectModal from "./ActiveProjectModal";
+import { PortfolioHeader } from "@/components/ui/MainHeader";
 
 interface Project {
   title: string;
